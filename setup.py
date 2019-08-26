@@ -6,7 +6,7 @@ import io
 import os
 import re
 from configparser import ConfigParser
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
 def read(fname):
@@ -26,7 +26,7 @@ def get_require_version(name):
 
 
 config = ConfigParser()
-config.read_file(open('tryton.cfg'))
+config.read_file(open(os.path.join(os.path.dirname(__file__), 'tryton.cfg')))
 info = dict(config.items('tryton'))
 for key in ('depends', 'extras_depend', 'xml'):
     if key in info:
@@ -51,6 +51,9 @@ for dep in info.get('depends', []):
         requires.append(get_require_version('trytond_%s' % dep))
 requires.append(get_require_version('trytond'))
 
+tests_require = []
+for dep in ['account_invoice', 'sale', 'purchase', 'stock']:
+    tests_require.append(get_require_version('trytond_%s' % dep))
 dependency_links = []
 if minor_version % 2:
     dependency_links.append('https://trydevpi.tryton.org/')
@@ -58,17 +61,25 @@ if minor_version % 2:
 setup(name=name,
     version=version,
     description='Tryton module to add countries on tax rules',
-    long_description=read('README'),
+    long_description=read('README.rst'),
     author='Tryton',
-    author_email='issue_tracker@tryton.org',
+    author_email='bugs@tryton.org',
     url='http://www.tryton.org/',
     download_url=download_url,
+    project_urls={
+        "Bug Tracker": 'https://bugs.tryton.org/',
+        "Documentation": 'https://docs.tryton.org/',
+        "Forum": 'https://www.tryton.org/forum',
+        "Source Code": (
+            'https://hg.tryton.org/modules/account_tax_rule_country'),
+        },
     keywords='tryton account tax rule country',
     package_dir={'trytond.modules.account_tax_rule_country': '.'},
-    packages=[
-        'trytond.modules.account_tax_rule_country',
-        'trytond.modules.account_tax_rule_country.tests',
-        ],
+    packages=(
+        ['trytond.modules.account_tax_rule_country'] +
+        ['trytond.modules.account_tax_rule_country.%s' % p
+            for p in find_packages()]
+        ),
     package_data={
         'trytond.modules.account_tax_rule_country': (info.get('xml', [])
             + ['tryton.cfg', 'view/*.xml', 'locale/*.po']),
@@ -87,6 +98,7 @@ setup(name=name,
         'Natural Language :: Czech',
         'Natural Language :: Dutch',
         'Natural Language :: English',
+        'Natural Language :: Finnish',
         'Natural Language :: French',
         'Natural Language :: German',
         'Natural Language :: Hungarian',
@@ -97,8 +109,9 @@ setup(name=name,
         'Natural Language :: Russian',
         'Natural Language :: Slovenian',
         'Natural Language :: Spanish',
+        'Natural Language :: Turkish',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
@@ -108,7 +121,7 @@ setup(name=name,
         'Topic :: Office/Business :: Financial :: Accounting',
         ],
     license='GPL-3',
-    python_requires='>=3.4',
+    python_requires='>=3.5',
     install_requires=requires,
     dependency_links=dependency_links,
     zip_safe=False,
@@ -118,4 +131,5 @@ setup(name=name,
     """,
     test_suite='tests',
     test_loader='trytond.test_loader:Loader',
+    tests_require=tests_require,
     )
