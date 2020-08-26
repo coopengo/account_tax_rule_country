@@ -44,6 +44,12 @@ if minor_version % 2:
     download_url = (
         'hg+http://hg.tryton.org/modules/%s#egg=%s-%s' % (
             name[8:], name, version))
+local_version = []
+for build in ['CI_BUILD_NUMBER', 'CI_JOB_NUMBER', 'CI_JOB_ID']:
+    if os.environ.get(build):
+        local_version.append(os.environ[build])
+if local_version:
+    version += '+' + '.'.join(local_version)
 
 requires = []
 for dep in info.get('depends', []):
@@ -76,8 +82,8 @@ setup(name=name,
     keywords='tryton account tax rule country',
     package_dir={'trytond.modules.account_tax_rule_country': '.'},
     packages=(
-        ['trytond.modules.account_tax_rule_country'] +
-        ['trytond.modules.account_tax_rule_country.%s' % p
+        ['trytond.modules.account_tax_rule_country']
+        + ['trytond.modules.account_tax_rule_country.%s' % p
             for p in find_packages()]
         ),
     package_data={
@@ -91,7 +97,8 @@ setup(name=name,
         'Intended Audience :: Developers',
         'Intended Audience :: Financial and Insurance Industry',
         'Intended Audience :: Legal Industry',
-        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+        'License :: OSI Approved :: '
+        'GNU General Public License v3 or later (GPLv3+)',
         'Natural Language :: Bulgarian',
         'Natural Language :: Catalan',
         'Natural Language :: Chinese (Simplified)',
@@ -102,6 +109,7 @@ setup(name=name,
         'Natural Language :: French',
         'Natural Language :: German',
         'Natural Language :: Hungarian',
+        'Natural Language :: Indonesian',
         'Natural Language :: Italian',
         'Natural Language :: Persian',
         'Natural Language :: Polish',
@@ -115,6 +123,7 @@ setup(name=name,
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Office/Business',
